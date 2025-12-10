@@ -6,6 +6,7 @@ import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants.js"
 
 const Forms = ({ route, method }) => {
   const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -17,7 +18,11 @@ const Forms = ({ route, method }) => {
     e.preventDefault();
 
     try {
-      const res = await api.post(route, { username, password });
+      const payload = method === 'login'
+        ? { username, password }
+        : { username, email, password };
+
+      const res = await api.post(route, payload);
       if (method === 'login') {
         localStorage.setItem(ACCESS_TOKEN, res.data.access);
         localStorage.setItem(REFRESH_TOKEN, res.data.refresh);
@@ -100,6 +105,44 @@ const Forms = ({ route, method }) => {
               </div>
             </div>
 
+            {/* Email Field - Only show for registration */}
+            {method === 'register' && (
+              <div>
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  Email Address
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg
+                      className="h-5 w-5 text-gray-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                      />
+                    </svg>
+                  </div>
+                  <input
+                    type="email"
+                    id="email"
+                    className="block w-full pl-10 pr-3 py-2.5 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                    placeholder="your.email@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+            )}
+
             {/* Password Field */}
             <div>
               <label
@@ -170,6 +213,18 @@ const Forms = ({ route, method }) => {
                 name
               )}
             </button>
+
+            {/* Forgot Password Link - Only show on login */}
+            {method === 'login' && (
+              <div className="text-center">
+                <a
+                  href="/forgot-password"
+                  className="text-xs sm:text-sm text-indigo-600 hover:text-indigo-800 font-medium transition-colors"
+                >
+                  Forgot your password?
+                </a>
+              </div>
+            )}
           </form>
 
           {/* Footer Links */}
